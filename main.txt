@@ -1,0 +1,47 @@
+CONSTANT MAX_TOKENS ← 100
+
+FUNCTION USER_INPUT(line, tokens, tokenCount)
+    INITIALIZE ss AS STRING_STREAM(line)
+    INITIALIZE tokenCount AS 0
+    WHILE ss CAN EXTRACT token AND tokenCount < MAX_TOKENS
+        tokens[tokenCount] ← token
+        tokenCount ← tokenCount + 1
+
+FUNCTION MAIN()
+    INITIALIZE interpreter AS NEW INTERPRETER
+    INITIALIZE line AS EMPTY STRING
+    INITIALIZE tokens AS ARRAY OF MAX_TOKENS STRINGS
+    INITIALIZE tokenCount AS 0
+
+    PRINT "Enter variable assignments (e.g., A 3 =). Type 'end' to finish:"
+
+    WHILE TRUE
+        PRINT "> "
+        READ line FROM USER INPUT
+        IF line = "end"
+            BREAK
+
+        USER_INPUT(line, tokens, tokenCount)
+
+        IF tokenCount = 3 AND tokens[2] = "="
+            varName ← FIRST CHARACTER OF tokens[0]
+            varValue ← CONVERT tokens[1] TO DOUBLE
+            CALL interpreter.ASSIGN_VARIABLE(varName, varValue)
+            CALL interpreter.symbolTable.PRINT()
+        ELSE
+            PRINT "Invalid input format for variable assignment."
+
+    PRINT "Enter the postfix expression:"
+    PRINT "> "
+    READ line FROM USER INPUT
+    USER_INPUT(line, tokens, tokenCount)
+
+    TRY
+        CALL interpreter.RUN(tokens, tokenCount)
+        PRINT "The result is: " + CALL interpreter.GET_RESULT()
+    CATCH EXCEPTION e
+        PRINT ERROR e.MESSAGE()
+
+    RETURN 0
+
+CALL MAIN()

@@ -1,0 +1,197 @@
+INTERPRETER_INITIALIZE()
+    stackTop ← -1
+
+STACK_POP()
+    if stackTop < 0
+        ERROR("stack is empty")
+    value ← stack[stackTop]
+    stackTop ← stackTop - 1
+    return value
+
+RESOLVE(value)
+    return value
+
+RESOLVE(variable)
+    return SYMBOL_TABLE_SEARCH(variable)
+
+ADD()
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← left + right
+
+MULTIPLY()
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← left * right
+
+SUBTRACT()
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← left - right
+
+DIVIDE()
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    if right = 0
+        ERROR("division by zero")
+    stackTop ← stackTop + 1
+    stack[stackTop] ← left / right
+
+MODULO()
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← left mod right
+
+ROUND()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← ROUND(value)
+
+FLOOR()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← FLOOR(value)
+
+CEIL()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← CEIL(value)
+
+ABS()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← ABS(value)
+
+COS()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← COS(value)
+
+SIN()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← SIN(value)
+
+TAN()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← TAN(value)
+
+LOG10()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← LOG10(value)
+
+LOG2()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← LOG2(value)
+
+EXP()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← EXP(value)
+
+FACTORIAL()
+    value ← RESOLVE(STACK_POP())
+    stackTop ← stackTop + 1
+    stack[stackTop] ← CALCULATE_FACTORIAL(value)
+
+COT()
+    value ← RESOLVE(STACK_POP())
+    sinValue ← SIN(value)
+    if sinValue = 0
+        ERROR("Cotangent is undefined for sin(x) = 0")
+    stackTop ← stackTop + 1
+    stack[stackTop] ← COS(value) / sinValue
+
+CALCULATE_FACTORIAL(n)
+    if n = 0 or n = 1
+        return 1
+    else
+        return n * CALCULATE_FACTORIAL(n - 1)
+
+MAX()
+    if stackTop < 1
+        ERROR("Not enough elements in the stack to perform max operation.")
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    maximum ← MAX(left, right)
+    stackTop ← stackTop + 1
+    stack[stackTop] ← maximum
+
+MIN()
+    if stackTop < 1
+        ERROR("Not enough elements in the stack to perform min operation.")
+    right ← RESOLVE(STACK_POP())
+    left ← RESOLVE(STACK_POP())
+    minimum ← MIN(left, right)
+    stackTop ← stackTop + 1
+    stack[stackTop] ← minimum
+
+RUN(tokens, tokenCount)
+    for i ← 0 to tokenCount - 1
+        token ← tokens[i]
+
+        if IS_DIGIT(token[0]) or (token[0] = '-' and LENGTH(token) > 1)
+            stackTop ← stackTop + 1
+            stack[stackTop] ← CONVERT_TO_DOUBLE(token)
+        else if LENGTH(token) = 1 and IS_ALPHA(token[0])
+            stackTop ← stackTop + 1
+            stack[stackTop] ← RESOLVE(token[0])
+        else
+            if token = "+"
+                ADD()
+            else if token = "*"
+                MULTIPLY()
+            else if token = "-"
+                SUBTRACT()
+            else if token = "/"
+                DIVIDE()
+            else if token = "%"
+                MODULO()
+            else if token = "round"
+                ROUND()
+            else if token = "floor"
+                FLOOR()
+            else if token = "ceil"
+                CEIL()
+            else if token = "abs"
+                ABS()
+            else if token = "cos"
+                COS()
+            else if token = "sin"
+                SIN()
+            else if token = "tan"
+                TAN()
+            else if token = "log10"
+                LOG10()
+            else if token = "log2"
+                LOG2()
+            else if token = "exp"
+                EXP()
+            else if token = "!"
+                FACTORIAL()
+            else if token = "cot"
+                COT()
+            else if token = "max"
+                MAX()
+            else if token = "min"
+                MIN()
+            else
+                ERROR("Unknown operator: " + token)
+    if stackTop ≠ 0
+        ERROR("stack length is " + (stackTop + 1))
+
+GET_RESULT()
+    if stackTop < 0
+        ERROR("stack is empty")
+    return stack[stackTop]
+
+ASSIGN_VARIABLE(varName, varValue)
+    SYMBOL_TABLE_INSERT(varName, varValue)
+

@@ -1,0 +1,294 @@
+
+#include "Interpreter.h"
+#include <cmath>
+#include <stdexcept>
+
+double Interpreter::stackPop() {
+    if (stack.empty()) {
+        throw std::runtime_error("stack is empty");
+    }
+    double top = stack.back();
+    stack.pop_back();
+    return top;
+}
+
+double Interpreter::resolve(double value) {
+    return value;
+}
+
+double Interpreter::resolve(char var) {
+    return symbolTable.search(var);
+}
+
+void Interpreter::add() {
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+    stack.push_back(left + right);
+}
+
+void Interpreter::multiply() {
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+    stack.push_back(left * right);
+}
+
+void Interpreter::subtract() {
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+    stack.push_back(left - right);
+}
+
+void Interpreter::divide() {
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+    stack.push_back(left / right);
+}
+
+void Interpreter::modulo() {
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+    stack.push_back(fmod(left, right));
+}
+
+void Interpreter::round() {
+    double value = resolve(stackPop());
+    stack.push_back(::round(value));
+}
+
+void Interpreter::floor() {
+    double value = resolve(stackPop());
+    stack.push_back(::floor(value));
+}
+
+void Interpreter::ceil() {
+    double value = resolve(stackPop());
+    stack.push_back(::ceil(value));
+}
+
+void Interpreter::abs() {
+    double value = resolve(stackPop());
+    stack.push_back(::fabs(value));
+}
+
+void Interpreter::cos() {
+    double value = resolve(stackPop());
+    stack.push_back(::cos(value));
+}
+
+void Interpreter::sin() {
+    double value = resolve(stackPop());
+    stack.push_back(::sin(value));
+}
+
+void Interpreter::tan() {
+    double value = resolve(stackPop());
+    stack.push_back(::tan(value));
+}
+
+void Interpreter::log10() {
+    double value = resolve(stackPop());
+    stack.push_back(::log10(value));
+}
+
+void Interpreter::log2() {
+    double value = resolve(stackPop());
+    stack.push_back(::log2(value));
+}
+
+void Interpreter::exp() {
+    double value = resolve(stackPop());
+    stack.push_back(::exp(value));
+}
+
+void Interpreter::factorial() {
+    double value = resolve(stackPop());
+    stack.push_back(calculateFactorial(value));
+}
+
+
+void Interpreter::cot() {
+    double value = resolve(stackPop());
+    double sinValue = std::sin(value);
+    if (sinValue == 0) {
+        throw std::runtime_error("Cotangent is undefined for sin(x) = 0");
+    }
+    stack.push_back(std::cos(value) / sinValue);
+}
+
+double Interpreter::calculateFactorial(double n) {
+    if (n == 0 || n == 1) {
+        return 1;
+    } else {
+        return n * calculateFactorial(n - 1);
+    }
+}
+
+void Interpreter::max() {
+    if (stack.size() < 2) {
+        throw std::runtime_error("Error: Not enough elements in the stack to perform max operation.");
+    }
+
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+
+    double maximum = std::max(left, right);
+
+    stack.push_back(maximum);
+}
+
+void Interpreter::min() {
+    if (stack.size() < 2) {
+        throw std::runtime_error("Error: Not enough elements in the stack to perform min operation.");
+    }
+
+    double right = resolve(stackPop());
+    double left = resolve(stackPop());
+
+    double minimum = std::min(left, right);
+
+    stack.push_back(minimum);
+}
+
+void Interpreter::run(const std::vector<std::string>& tokens) {
+    for (const std::string& token : tokens) {
+        if (isdigit(token[0]) || (token[0] == '-' && token.size() > 1)) {
+            stack.push_back(std::stod(token));
+        } else if (token.size() == 1 && isalpha(token[0])) {
+            stack.push_back(resolve(token[0]));
+        } else {
+            if (token == "+") add();
+            else if (token == "*") multiply();
+            else if (token == "-") subtract();
+            else if (token == "/") divide();
+            else if (token == "%") modulo();
+            else if (token == "round") round();
+            else if (token == "floor") floor();
+            else if (token == "ceil") ceil();
+            else if (token == "abs") abs();
+            else if (token == "cos") cos();
+            else if (token == "sin") sin();
+            else if (token == "tan") tan();
+            else if (token == "log10") log10();
+            else if (token == "log2") log2();
+            else if (token == "exp") exp();
+            else if (token == "!") factorial();
+            else if (token == "round") round();
+            else if (token == "cot") cot();
+            else if (token == "max") max();
+            else if (token == "min") min();
+            else {
+                throw std::runtime_error("Unknown operator: " + token);
+            }
+        }
+    }
+    if (stack.size() != 1) {
+        throw std::runtime_error("stack length is " + std::to_string(stack.size()));
+    }
+}
+
+double Interpreter::getResult() {
+    if (stack.empty()) {
+        throw std::runtime_error("stack is empty");
+    }
+    return stack.back();
+}
+
+void Interpreter::assignVariable(char varName, double varValue) {
+    symbolTable.insert(varName, varValue);
+}
+
+#include <vector>
+#include <string>
+#include "HashTable.h"
+
+class Interpreter {
+private:
+    std::vector<double> stack;
+    HashTable symbolTable;
+
+    double stackPop();
+    double resolve(double value);
+    double resolve(char var);
+
+    void add();
+    void multiply();
+    void subtract();
+    void divide();
+    void modulo();
+    void round();
+    void floor();
+    void ceil();
+    void abs();
+    void cos();
+    void sin();
+    void tan();
+    void log10();
+    void log2();
+    void exp();
+    void factorial();
+    void cot(); 
+    void max();
+    void min();
+
+
+    double calculateFactorial(double n);
+
+public:
+    void run(const std::vector<std::string>& tokens);
+    double getResult();
+    void assignVariable(char varName, double varValue);
+};
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include "Interpreter.h"
+
+using namespace std;
+
+// Convert user input line to tokens
+vector<string> userInput(const string& line) {
+    vector<string> tokens;
+    stringstream ss(line);
+    string token;
+    while (ss >> token) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+int main() {
+    Interpreter interpreter;
+    string line;
+
+    cout << "Enter variable assignments (e.g., A 3 =). Type 'end' to finish:" << endl;
+    while (true) {
+        cout << "> ";
+        getline(cin, line);
+        if (line == "end") break;
+
+        vector<string> tokens = userInput(line);
+        if (tokens.size() == 3 && tokens[2] == "=") {
+            char varName = tokens[0][0];
+            double varValue = stod(tokens[1]);
+            interpreter.assignVariable(varName, varValue);
+        } else {
+            cout << "Invalid input format for variable assignment." << endl;
+        }
+    }
+
+    cout << "Enter the postfix expression:" << endl;
+    cout << "> ";
+    getline(cin, line);
+    vector<string> tokens = userInput(line);
+
+    try {
+        interpreter.run(tokens);
+        cout << interpreter.getResult() << endl;
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+    }
+
+    return 0;
+}
+

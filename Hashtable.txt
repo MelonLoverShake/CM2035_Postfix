@@ -1,0 +1,35 @@
+HASH_TABLE_INITIALIZE()
+    for i ← 0 to LETTERS_COUNT - 1
+        VALUES[i] ← NaN
+
+HASH_FUNC(key)
+    return key - 'A'
+
+CHECK_VARIABLE(key)
+    if key < 'A' or key > 'Z'
+        ERROR("Variables should be from A to Z")
+
+HASH_TABLE_INSERT(key, value)
+    CHECK_VARIABLE(key)
+    index ← HASH_FUNC(key)
+    VALUES[index] ← value
+
+HASH_TABLE_SEARCH(key)
+    CHECK_VARIABLE(key)
+    index ← HASH_FUNC(key)
+    if VALUES[index] = NaN
+        ERROR("Unknown variable " + key)
+    return VALUES[index]
+
+HASH_TABLE_REMOVE(key)
+    CHECK_VARIABLE(key)
+    index ← HASH_FUNC(key)
+    VALUES[index] ← NaN
+
+HASH_TABLE_PRINT()
+    for i ← 0 to LETTERS_COUNT - 1
+        variable ← 'A' + i
+        if VALUES[i] = NaN
+            PRINT(variable + " = N/A")
+        else
+            PRINT(variable + " = " + VALUES[i])
