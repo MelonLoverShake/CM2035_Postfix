@@ -12,5 +12,6 @@ public:
     double search(char key);
     void remove(char key);
     void print();
+    void clear();
 };
 

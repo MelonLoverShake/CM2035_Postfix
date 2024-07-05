@@ -70,3 +70,10 @@ void HashTable::print() {
     oss << " }";
     std::cout << oss.str() << std::endl;
 }
+
+void HashTable::clear()
+{
+     for (int i = 0; i < LETTERS_COUNT; i++) {
+        values[i] = std::numeric_limits<double>::quiet_NaN();
+    }
+}

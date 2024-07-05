@@ -12,6 +12,13 @@ double Interpreter::stackPop() {
     return stack[stackTop--];
 }
 
+double Interpreter::peek() const {
+    if (stackTop < 0) {
+        throw std::runtime_error("stack is empty");
+    }
+    return stack[stackTop];
+}
+
 double Interpreter::resolve(double value) {
     return value;
 }
@@ -191,7 +198,7 @@ void Interpreter::run(const std::string tokens[], int tokenCount) {
 
 double Interpreter::getResult() {
     if (stackTop < 0) {
-        throw std::runtime_error("stack is empty");
+        throw std::runtime_error("Stack is empty");
     }
     return stack[stackTop];
 }

@@ -39,6 +39,7 @@ public:
     Interpreter();
     void run(const std::string tokens[], int tokenCount);
     double getResult();
+    double peek() const;
     void assignVariable(char varName, double varValue);
     HashTable symbolTable;
 };

@@ -1,3 +1,9 @@
+/*
+Name: Tan Yee Chong 
+Student Number (S/N): 230668566
+Module Number: CM2035
+Submission Date: 8 July 2024
+*/
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -24,11 +30,17 @@ int main() {
     string tokens[MAX_TOKENS];
     int tokenCount;
 
-    cout << "Enter variable assignments (e.g., A 3 =). Type 'end' to finish:" << endl;
+    cout << "Enter variable assignments (e.g., A 3 =). Type 'clear' to reset hashtable or 'end' to finish:" << endl;
     while (true) {
         cout << "> ";
         getline(cin, line);
         if (line == "end") break;
+
+        if (line == "clear") {
+            interpreter.symbolTable.clear();
+            cout << "HashTable cleared." << endl;
+            continue; // Skip the rest of the loop and go to the next iteration
+        }
 
         userInput(line, tokens, tokenCount);
         if (tokenCount == 3 && tokens[2] == "=") {
@@ -48,7 +60,7 @@ int main() {
 
     try {
         interpreter.run(tokens, tokenCount);
-cout << "The result is: " << interpreter.getResult() << endl;
+        cout << "The result is: " << interpreter.getResult() << endl;
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
